@@ -1,3 +1,6 @@
+Note taking dapp with Internet Identity.
+
+Using template:
 # Vite + React + Motoko
 
 ### Get started directly in your browser:
