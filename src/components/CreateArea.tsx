@@ -46,14 +46,14 @@ const AddNoteBtn = styled.a`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: clamp(70px, 15vw, 100px);
-  height: clamp(70px, 15vw, 100px);
+  width: clamp(50px, 10vw, 75px);
+  height: clamp(50px, 10vw, 75px);
   background: rgba(46, 95, 212, 1);
-  font-size: clamp(3rem, 20vw, 8rem);
+  font-size: clamp(2rem, 10vw, 5rem);
   border-radius: 50%;
   color: rgba(22, 25, 37, 1);
   z-index: 1;
-`;
+`
 
 function CreateArea({ actor, setActor }: any) {
 	let { backend, notes } = actor;

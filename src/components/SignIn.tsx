@@ -51,7 +51,7 @@ export default function SignIn({setActor, fetchData}:any){
 				}
 			);
 			authCset((state:any) => ({...state, isAuthenticated:false}));
-			fetchData(backend)
+			//fetchData(backend)
 			return
 		}
 		
@@ -79,6 +79,7 @@ export default function SignIn({setActor, fetchData}:any){
 				process.env.DFX_NETWORK === "ic"
 				? "https://identity.ic0.app"
 				: `http://rdmx6-jaaaa-aaaaa-aaadq-cai.localhost:4943`,
+				maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000),// 7 days
 				onSuccess: async () => handle(authClient),
 				windowOpenerFeatures:'"toolbar=0,location=0,menubar=0,width=500,height=500,left=100,top=100"'
 			});
