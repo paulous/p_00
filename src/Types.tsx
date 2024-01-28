@@ -1,6 +1,9 @@
-export type NewUser = {
-	name: String;
-	birthday: Number;
+import { ActorSubclass, AnonymousIdentity, Identity } from "@dfinity/agent";
+import { _SERVICE } from "./declarations/backend/backend.did";
+
+export type User = {
+	owner: String;
+	creation: Number;
 };
 
 export type NoteType = {
@@ -9,8 +12,10 @@ export type NoteType = {
 	description: string;
 };
 
-export type Identity = {
-	identity:{getPrincipal:Function;};
-	backend:{readNotes:Function};
-	notes:[];
+export type State = {
+	user?:User;
+	identity:Identity | AnonymousIdentity;
+	backend:ActorSubclass<_SERVICE>;
+	notes:[NoteType] | [];
+
 }

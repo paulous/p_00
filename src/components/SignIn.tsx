@@ -3,11 +3,14 @@ import { createActor, backend } from "../declarations/backend"
 import { canisterId } from "../declarations/internet_identity"
 import { AuthClient } from "@dfinity/auth-client"
 import { HttpAgent, AnonymousIdentity } from "@dfinity/agent"
+
+import { State } from '../Types';
+
 //import { Principal } from '@dfinity/principal'
 
 export default function SignIn({setActor, fetchData}:any){
 
-	let [authC, authCset] =  useState<{logout:any, isAuthenticated:any}>();
+	let [authC, authCset] =  useState<{logout:any, isAuthenticated:Boolean}>();
 	
 	let actor = backend;
 
@@ -21,17 +24,23 @@ export default function SignIn({setActor, fetchData}:any){
 			agent,
 		});
 
-		setActor((state:any) => (
-			{...state, 
+		let user = await actor.isUserRegistred()
+
+		setActor((state:State) => (
+			{...state,
+				user,
 				identity, 
-				backend:actor, 
-				logout:authClient.logout, 
-				isAuth:authClient.isAuthenticated
+				backend:actor
 			}
 		))
 
 		let isAuthenticated:boolean = await authClient?.isAuthenticated()
-		authCset({logout:authClient.logout, isAuthenticated});
+		/*switch (await actor.isUserRegistred()){
+			case (null) : {#err("no user registred")};
+			case (?usr) :  {#ok(usr)};
+		}*/
+
+		authCset({logout:authClient.logout, isAuthenticated})
 		fetchData(actor)
 
 		//let isUser = await actor.setUser()
@@ -41,10 +50,11 @@ export default function SignIn({setActor, fetchData}:any){
 		e.preventDefault();
 
 		//console.log(await authC?.isAuthenticated)
-		if(await authC?.isAuthenticated){
+		if(authC && authC.isAuthenticated){
 			authC?.logout();
 			setActor(
 				{
+					user:null,
 					identity:new AnonymousIdentity(),
 					backend,
 					notes: []

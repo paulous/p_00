@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { GlobalStyle } from './GlobalStyle';
 import SignIn from './components/SignIn';
 import CreateArea from './components/CreateArea';
-import { Identity } from './Types';
+import { State } from './Types';
 
 const AppMain = styled.div`
   display: flex;
@@ -19,7 +19,7 @@ const Nav = styled.nav`
   justify-content: space-between;
   padding: 5px;
 
-  .sdiv {
+  div {
     container-type: normal;
     display: flex;
     align-items: center;
@@ -42,16 +42,16 @@ const Main = styled.main`
 `;
 
 export default function App() {
-  const [actor, setActor] = useState<Identity>({
+  const [actor, setActor] = useState<State>({
     identity: new AnonymousIdentity(),
     backend,
-    notes: [],
+	notes:[]
   });
 
   const fetchData = async (signedin: any) => {
     const notesArray = await signedin.readNotes();
     let notes = JSON.parse(notesArray);
-    notes && setActor((state) => ({ ...state, notes }));
+    setActor((state) => ({ ...state, notes }));
   };
 
   //useEffect(() => { fetchData(actor.backend) }, [])
@@ -62,13 +62,13 @@ export default function App() {
       <AppMain>
         <Nav>
           <h2>dNote</h2>
-          <div className="sdiv">
-            <h4>{actor.identity.getPrincipal().toString()}</h4>
+          <div>
+            <h4>{actor?.identity?.getPrincipal().toString()}</h4>
             <SignIn {...{ setActor, fetchData }} />
           </div>
         </Nav>
         <Main>
-          <CreateArea {...{ actor, setActor }} />
+          {actor?.identity && <CreateArea {...{ actor, setActor }} />}
         </Main>
       </AppMain>
     </>

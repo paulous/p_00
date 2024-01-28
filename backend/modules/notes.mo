@@ -5,6 +5,7 @@ import Int "mo:base/Int";
 import Option "mo:base/Option";
 import List "mo:base/List";
 import Buffer "mo:base/Buffer";
+import {print} "mo:base/Debug";
 import Map "mo:map/Map";
 import Constants "constants";
 import JSON "mo:json/JSON";
@@ -12,11 +13,13 @@ import Utils "utils";
 
 module {
 
-	type UserData = Types.UserData;
+	type State = Types.State;
 
 	type Note = Types.Note;
 
 	type User = Types.User;
+
+	type PostResult = Types.PostResult;
 
 	let MAX_NOTES_PER_USER = Constants.MAX_NOTES_PER_USER;
 
@@ -24,34 +27,50 @@ module {
 
 	public func createNote(
 		caller : Principal,
-		notes : Map.Map<Principal, List.List<Note>>,
-		{ description : Text; title : Text } : Note,
+		state : State,
+		{
+			description : Text;
+			title : Text;
+			id : Text;
+		} : Note,
 	) : Text {
 
-		var time = Time.now(); // 2023-07-19 05:45:44.873008989 UTC: [Canister bkyz2-fmaaa-aaaaa-qaaaq-cai] +1_689_745_544_873_008_989
-		let withNewId = Int.toText(time);
+		switch (Map.get(state.notes, phash, caller)) {
 
-		let userNotes = Option.get(Map.get(notes, phash, caller), List.nil<Note>());
+			case (null) { 
+				var time = Time.now(); // 2023-07-19 05:45:44.873008989 UTC: [Canister bkyz2-fmaaa-aaaaa-qaaaq-cai] +1_689_745_544_873_008_989
+				let withNewId = Int.toText(time);
+				withNewId;
+			 };
 
-		assert List.size(userNotes) <= MAX_NOTES_PER_USER;
+			case (?usr) {
 
-		let newNote = {
-			id = withNewId;
-			title = title;
-			description = description;
+				var time = Time.now(); // 2023-07-19 05:45:44.873008989 UTC: [Canister bkyz2-fmaaa-aaaaa-qaaaq-cai] +1_689_745_544_873_008_989
+				let withNewId = Int.toText(time);
+
+				let userNotes = Option.get(Map.get(state.notes, phash, caller), List.nil<Note>());
+
+				assert List.size(userNotes) <= MAX_NOTES_PER_USER;
+
+				let newNote = {
+					id = withNewId;
+					title = title;
+					description = description;
+				};
+
+				ignore Map.put(state.notes, phash, caller, List.push(newNote, userNotes));
+
+				withNewId;
+			};
 		};
-
-		ignore Map.put(notes, phash, caller, List.push(newNote, userNotes));
-
-		withNewId;
 	};
 
 	public func readNotes(
 		caller : Principal,
-		notes : Map.Map<Principal, List.List<Note>>,
+		state : State,
 	) : Text {
 
-		let userNotes = Option.get(Map.get(notes, phash, caller), List.nil());
+		let userNotes = Option.get(Map.get(state.notes, phash, caller), List.nil());
 
 		//assert List.size(userNotes) < MAX_NOTES_PER_USER;
 
@@ -80,24 +99,35 @@ module {
 			description : Text;
 			id : Text;
 		},
-		notes : Map.Map<Principal, List.List<Note>>,
+		state : State,
 	) : Text {
 
-		let userNotes = Option.get(Map.get(notes, phash, caller), List.nil<Note>());
-		let time = Time.now();
-		let withNewId = Int.toText(time);
 
-		var updatedNotes = List.map(
-			userNotes,
-			func(note : Note) : Note {
-				if (note.id == id) { { title; description; id = withNewId } } else {
-					note;
-				};
-			},
-		);
+		switch (Map.get(state.users, phash, caller)) {
+			case (null) { 
+				var time = Time.now(); // 2023-07-19 05:45:44.873008989 UTC: [Canister bkyz2-fmaaa-aaaaa-qaaaq-cai] +1_689_745_544_873_008_989
+				let withNewId = Int.toText(time);
+				withNewId;
+			 };
+			case (?usr) {
+				let userNotes = Option.get(Map.get(state.notes, phash, caller), List.nil<Note>());
+				let time = Time.now();
+				let withNewId = Int.toText(time);
 
-		ignore Map.put(notes, phash, caller, updatedNotes);
+				var updatedNotes = List.map(
+					userNotes,
+					func(note : Note) : Note {
+						if (note.id == id) { { title; description; id = withNewId } } 
+						else {
+							note;
+						};
+					},
+				);
 
-		withNewId;
+				ignore Map.put(state.notes, phash, caller, updatedNotes);
+				
+				withNewId;
+			};
+		};
 	};
 };

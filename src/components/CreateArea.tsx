@@ -4,7 +4,7 @@ import Note from './Note';
 import NoteNew from './NoteNew';
 //import { backend } from '../declarations/backend';
 //import Loader from "./Loader";
-import { NoteType, Identity } from '../Types';
+import { NoteType, State } from '../Types';
 
 const NotesCont = styled.div`
   display: flex;
@@ -64,14 +64,17 @@ function CreateArea({ actor, setActor }: any) {
 	const toggle = () => setToggleAddNote(!toggleAddNote);
 
 	async function addNote(newNote: NoteType) {
+
 		let { title, description } = newNote;
-		if (!newNote.title || !newNote.description) return;
+
+		if (!title || !description || title.length < 3 || title.length > 50 || 
+			description.length < 3 || description.length > 250) return;
 
 		//setNote({ title: '', description: '', id: '' });
 		setToggleAddNote(!toggleAddNote);
-		setActor((state: Identity) => ({
+		setActor((state: State) => ({
 			...state,
-			notes: [{ title, description, id: '' }, ...state.notes],
+			notes: [{ title, description, id: "" }, ...state.notes],
 		}));
 
 		let descRetainFormatting = JSON.stringify(description)
@@ -82,13 +85,13 @@ function CreateArea({ actor, setActor }: any) {
 			let datetime = await backend.createNote({
 				title,
 				description: descRetainFormatting,
-				id: '',
+				id: "",
 			});
 
-			setActor((state: Identity) => ({
+			setActor((state: State) => ({
 				...state,
-				notes: state.notes.map((note: NoteType, i, a: NoteType[]) => {
-					if (note.id === '') {
+				notes: state.notes.map((note, i, a) => {
+					if (note.id === "") {
 						a[i].id = datetime;
 					}
 					return note;
@@ -100,14 +103,20 @@ function CreateArea({ actor, setActor }: any) {
 	}
 
 	async function updateNote({ title, description, id }: NoteType) {
+
 		let oldnote = notes[notes.findIndex((n: NoteType) => n.id === id)];
+
 		if (title === oldnote.title && description === oldnote.description) return;
+		
+		if (!title || !description || title.length < 3 || title.length > 50 || 
+			description.length < 3 || description.length > 250) return;
 
 		setUpdating(id)
-		setActor((state: Identity) => {
-			let indx = state.notes.findIndex((note: NoteType) => note.id === id);
-			let s: Array<NoteType> = state.notes.slice(0);
-			s[indx] = { title, description, id };
+		setActor((state: State) => {
+			let indx = state.notes?.findIndex((note: NoteType) => note.id === id);
+			let s = state.notes?.slice(0);
+
+			if (indx !== undefined && s !== undefined) { s[indx] = { title, description, id } }
 			return { ...state, notes: s };
 		});
 
@@ -123,9 +132,9 @@ function CreateArea({ actor, setActor }: any) {
 			});
 			setUpdating('')
 			//setNote({ title: '', description: '', id: '' });
-			setActor((state: Identity) => ({
+			setActor((state: State) => ({
 				...state,
-				notes: state.notes.map((note: NoteType, i, a: NoteType[]) => {
+				notes: state.notes?.map((note: NoteType, i, a: NoteType[]) => {
 					if (note.id === id) {
 						a[i].id = datetime;
 					}
@@ -140,9 +149,9 @@ function CreateArea({ actor, setActor }: any) {
 		try {
 			await actor.backend.deleteNote(id);
 			setUpdating('')
-			setActor((state: Identity) => ({
+			setActor((state: State) => ({
 				...state,
-				notes: state.notes.filter((note: NoteType) => note.id !== id),
+				notes: state.notes?.filter((note: NoteType) => note.id !== id),
 			}));
 		} catch (error) {
 			console.log('error on delete.');

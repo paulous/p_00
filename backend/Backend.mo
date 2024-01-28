@@ -3,7 +3,6 @@ import JSON "mo:json/JSON";
 import Buffer "mo:base/Buffer";
 import Principal "mo:base/Principal";
 import Nat "mo:base/Nat";
-import {print} "mo:base/Debug";
 import Array "mo:base/Array";
 import List "mo:base/List";
 import Option "mo:base/Option";
@@ -12,6 +11,9 @@ import Time "mo:base/Time";
 import Int "mo:base/Int";
 import Text "mo:base/Text";
 import Bool "mo:base/Bool";
+import {print} "mo:base/Debug";
+import Error "mo:base/Error";
+
 import Types "./modules/types";
 import Constants "modules/constants";
 import Notes "modules/notes";
@@ -19,11 +21,13 @@ import Utils "modules/utils";
 
 shared ({caller}) actor class Dnote(){
 
-	type UserData = Types.UserData;
+	type State = Types.State;
 
 	type Note = Types.Note;
 
 	type User = Types.User;
+
+	type PostResult = Types.PostResult;
 
 	let owner = caller;
 
@@ -35,9 +39,18 @@ shared ({caller}) actor class Dnote(){
 
 	let { phash } = Map;
 
-	stable let users = Map.new<Principal, User>(phash);
-	stable let notes = Map.new<Principal, List.List<Note>>(phash);
+	stable let state:State = object {
+		public let users = Map.new<Principal, User>(phash);
+		public let notes = Map.new<Principal, List.List<Note>>(phash);
+	};
 
+	public shared ({caller}) func isUserRegistred () : async Text {
+
+		if (Principal.isAnonymous(caller)) throw Error.reject("Anonymous users cannot register");
+
+
+		Utils.is_user_registered(caller, state.users);
+	};
 
 	public shared ({ caller }) func createNote({ description : Text; title : Text }:Note) : async Text {
 
@@ -49,7 +62,7 @@ shared ({caller}) actor class Dnote(){
 		assert Text.size(description) < MAX_CHARS_NOTE_DESC 
 		and Text.size(description) > MIN_CHARS_NOTE_DESC;
 		
-		Notes.createNote(caller, notes, {description; title; id="0"});
+		Notes.createNote(caller, state, {description; title; id="0"});
 	};
 
 
@@ -57,7 +70,7 @@ shared ({caller}) actor class Dnote(){
 
 		assert not Principal.isAnonymous(caller);
 
-  		Notes.readNotes(caller, notes);
+  		Notes.readNotes(caller, state);
 	};
 
 
@@ -71,7 +84,7 @@ shared ({caller}) actor class Dnote(){
 		assert Text.size(description) < MAX_CHARS_NOTE_DESC 
 		and Text.size(description) > MIN_CHARS_NOTE_DESC;
 
-		Notes.updateNote(caller, {id; title; description}, notes);
+		Notes.updateNote(caller, {id; title; description}, state);
 	};
 	
 
@@ -79,9 +92,9 @@ shared ({caller}) actor class Dnote(){
 
 		assert not Principal.isAnonymous(caller);
 
-		let userNotes = Option.get(Map.get(notes, phash, caller), List.nil());
+		let userNotes = Option.get(Map.get(state.notes, phash, caller), List.nil());
 
-		ignore Map.put(notes, phash, caller, List.filter(userNotes, func(note:Note): Bool { note.id != id }));
+		ignore Map.put(state.notes, phash, caller, List.filter(userNotes, func(note:Note): Bool { note.id != id }));
 	};
 
 }

@@ -1,7 +1,10 @@
 import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import List "mo:base/List";
+import Time "mo:base/Time";
 import Map "mo:map/Map";
+import JSON "mo:json/JSON";
+
 import Types "types";
 
 module {
@@ -11,22 +14,41 @@ module {
 
 	let { phash } = Map;
 
-	public func is_user_registered(caller : Principal, users : Map.Map<Principal, User>) : Bool {
-		Option.isSome(Map.get(users, phash, caller));
+	public func is_user_registered(caller : Principal, users : Map.Map<Principal, User>) : Text {
+		
+		switch (Map.get(users, phash, caller)){
+
+			case (null) {
+
+				let usr = {owner = caller; creation = Time.now()};
+				ignore Map.put(users, phash, caller, usr);
+
+				JSON.show(
+					#Object([
+						("owner", #String(Principal.toText(caller))),
+						("creation", #Number(usr.creation)),
+						("new", #Boolean(true))
+					])
+				);
+				
+			};
+
+			case (?user) {
+				JSON.show(
+					#Object([
+						("owner", #String(Principal.toText(user.owner))),
+						("creation", #Number(user.creation)),
+					])
+				);
+			};
+		};
 	};
 
 	public func register_user(caller : Principal, users : Map.Map<Principal, User>) : User {
 
 		var new : User = {
-			principal = caller;
-			userData = {
-				uiPrefs = {
-					theme = true;
-					pinned = [0, 1];
-					order = [0, 1];
-				};
-				points = [0];
-			};
+			owner = caller;
+			creation = Time.now();
 		};
 
 		ignore Map.put(users, phash, caller, new);
