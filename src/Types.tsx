@@ -13,9 +13,10 @@ export type NoteType = {
 };
 
 export type State = {
-	user?:User;
+	user:User | {};
 	identity:Identity | AnonymousIdentity;
 	backend:ActorSubclass<_SERVICE>;
 	notes:[NoteType] | [];
+	isAuth:Boolean;
 
 }

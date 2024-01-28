@@ -56,7 +56,7 @@ const AddNoteBtn = styled.a`
 `
 
 function CreateArea({ actor, setActor }: any) {
-	let { backend, notes } = actor;
+	let { backend, notes, isAuth } = actor;
 
 	const [toggleAddNote, setToggleAddNote] = useState(false);
 	const [updating, setUpdating] = useState('');
@@ -113,8 +113,8 @@ function CreateArea({ actor, setActor }: any) {
 
 		setUpdating(id)
 		setActor((state: State) => {
-			let indx = state.notes?.findIndex((note: NoteType) => note.id === id);
-			let s = state.notes?.slice(0);
+			let indx = state.notes.findIndex((note: NoteType) => note.id === id);
+			let s = state.notes.slice(0);
 
 			if (indx !== undefined && s !== undefined) { s[indx] = { title, description, id } }
 			return { ...state, notes: s };
@@ -151,7 +151,7 @@ function CreateArea({ actor, setActor }: any) {
 			setUpdating('')
 			setActor((state: State) => ({
 				...state,
-				notes: state.notes?.filter((note: NoteType) => note.id !== id),
+				notes: state.notes.filter((note: NoteType) => note.id !== id),
 			}));
 		} catch (error) {
 			console.log('error on delete.');
@@ -167,7 +167,7 @@ function CreateArea({ actor, setActor }: any) {
 						<NoteNew onAdd={addNote} />
 					</div>
 				)}
-				{notes && !toggleAddNote &&
+				{isAuth && !toggleAddNote &&
 					notes.map((note: NoteType, index: number) => {
 						return (
 							<Note
@@ -179,9 +179,9 @@ function CreateArea({ actor, setActor }: any) {
 							/>
 						);
 					})}
-				<AddNoteBtn title="Create note" onClick={toggle}>
+				{isAuth && <AddNoteBtn title="Create note" onClick={toggle}>
 					{toggleAddNote ? '-' : '+'}
-				</AddNoteBtn>
+				</AddNoteBtn>}
 			</NotesCont>
 		</>
 	);

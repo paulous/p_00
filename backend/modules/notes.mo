@@ -40,17 +40,28 @@ module {
 			case (null) { 
 				var time = Time.now(); // 2023-07-19 05:45:44.873008989 UTC: [Canister bkyz2-fmaaa-aaaaa-qaaaq-cai] +1_689_745_544_873_008_989
 				let withNewId = Int.toText(time);
+
+					let newList = List.nil<Note>();
+					
+					let newNote = {
+					id = withNewId;
+					title = title;
+					description = description;
+				};
+
+				ignore Map.put(state.notes, phash, caller, List.push(newNote, newList));
+
 				withNewId;
 			 };
 
-			case (?usr) {
+			case (?notes) {
 
 				var time = Time.now(); // 2023-07-19 05:45:44.873008989 UTC: [Canister bkyz2-fmaaa-aaaaa-qaaaq-cai] +1_689_745_544_873_008_989
 				let withNewId = Int.toText(time);
 
-				let userNotes = Option.get(Map.get(state.notes, phash, caller), List.nil<Note>());
+				//let userNotes = Option.get(Map.get(state.notes, phash, caller), List.nil<Note>());
 
-				assert List.size(userNotes) <= MAX_NOTES_PER_USER;
+				assert List.size(notes) <= MAX_NOTES_PER_USER;
 
 				let newNote = {
 					id = withNewId;
@@ -58,7 +69,7 @@ module {
 					description = description;
 				};
 
-				ignore Map.put(state.notes, phash, caller, List.push(newNote, userNotes));
+				ignore Map.put(state.notes, phash, caller, List.push(newNote, notes));
 
 				withNewId;
 			};

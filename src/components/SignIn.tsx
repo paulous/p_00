@@ -30,11 +30,12 @@ export default function SignIn({setActor, fetchData}:any){
 			{...state,
 				user,
 				identity, 
-				backend:actor
+				backend:actor,
+				isAuth:true
 			}
 		))
 
-		let isAuthenticated:boolean = await authClient?.isAuthenticated()
+		let isAuthenticated:boolean = await authClient.isAuthenticated()
 		/*switch (await actor.isUserRegistred()){
 			case (null) : {#err("no user registred")};
 			case (?usr) :  {#ok(usr)};
@@ -51,13 +52,18 @@ export default function SignIn({setActor, fetchData}:any){
 
 		//console.log(await authC?.isAuthenticated)
 		if(authC && authC.isAuthenticated){
-			authC?.logout();
+
+			const client: AuthClient = await AuthClient.create();
+			
+			await client.logout();
+
 			setActor(
 				{
 					user:null,
 					identity:new AnonymousIdentity(),
 					backend,
-					notes: []
+					notes: [],
+					isAuth:false
 				}
 			);
 			authCset((state:any) => ({...state, isAuthenticated:false}));

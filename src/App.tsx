@@ -43,14 +43,17 @@ const Main = styled.main`
 
 export default function App() {
   const [actor, setActor] = useState<State>({
+	user:{},
     identity: new AnonymousIdentity(),
     backend,
-	notes:[]
+	notes:[],
+	isAuth:false
   });
 
   const fetchData = async (signedin: any) => {
-    const notesArray = await signedin.readNotes();
-    let notes = JSON.parse(notesArray);
+	  const notesArray = await signedin.readNotes();
+	  let notes = JSON.parse(notesArray);
+	  console.log(notes)
     setActor((state) => ({ ...state, notes }));
   };
 
