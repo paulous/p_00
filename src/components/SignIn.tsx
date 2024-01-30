@@ -6,8 +6,6 @@ import { HttpAgent, AnonymousIdentity } from "@dfinity/agent"
 
 import { State } from '../Types';
 
-//import { Principal } from '@dfinity/principal'
-
 export default function SignIn({setActor, fetchData}:any){
 
 	let [authC, authCset] =  useState<{logout:any, isAuthenticated:Boolean}>();
@@ -26,6 +24,8 @@ export default function SignIn({setActor, fetchData}:any){
 
 		let user = await actor.isUserRegistred()
 
+		console.log(user)
+
 		setActor((state:State) => (
 			{...state,
 				user,
@@ -36,25 +36,18 @@ export default function SignIn({setActor, fetchData}:any){
 		))
 
 		let isAuthenticated:boolean = await authClient.isAuthenticated()
-		/*switch (await actor.isUserRegistred()){
-			case (null) : {#err("no user registred")};
-			case (?usr) :  {#ok(usr)};
-		}*/
 
 		authCset({logout:authClient.logout, isAuthenticated})
 		fetchData(actor)
-
-		//let isUser = await actor.setUser()
 	}
 
 	let signin = async (e: { preventDefault: () => void }) => {
 		e.preventDefault();
 
-		//console.log(await authC?.isAuthenticated)
 		if(authC && authC.isAuthenticated){
 
 			const client: AuthClient = await AuthClient.create();
-			
+
 			await client.logout();
 
 			setActor(
@@ -67,7 +60,7 @@ export default function SignIn({setActor, fetchData}:any){
 				}
 			);
 			authCset((state:any) => ({...state, isAuthenticated:false}));
-			//fetchData(backend)
+			
 			return
 		}
 		
@@ -79,15 +72,9 @@ export default function SignIn({setActor, fetchData}:any){
 				}
 			}
 		);
-
 		
 		// start the login process and wait for it to finish
-
 		// To access Internet Identity or configure it for your dapp, use one of the following URLs:
-
-		// Chrome, Firefox: http://<canister_id>.localhost:4943
-		// Safari: http://localhost:4943?canisterId=<canister_id>
-
 
 		await new Promise((resolve) => {
 			authClient.login({

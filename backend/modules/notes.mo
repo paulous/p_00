@@ -19,8 +19,6 @@ module {
 
 	type User = Types.User;
 
-	type PostResult = Types.PostResult;
-
 	let MAX_NOTES_PER_USER = Constants.MAX_NOTES_PER_USER;
 
 	let { phash } = Map;
@@ -59,8 +57,6 @@ module {
 				var time = Time.now(); // 2023-07-19 05:45:44.873008989 UTC: [Canister bkyz2-fmaaa-aaaaa-qaaaq-cai] +1_689_745_544_873_008_989
 				let withNewId = Int.toText(time);
 
-				//let userNotes = Option.get(Map.get(state.notes, phash, caller), List.nil<Note>());
-
 				assert List.size(notes) <= MAX_NOTES_PER_USER;
 
 				let newNote = {
@@ -82,8 +78,6 @@ module {
 	) : Text {
 
 		let userNotes = Option.get(Map.get(state.notes, phash, caller), List.nil());
-
-		//assert List.size(userNotes) < MAX_NOTES_PER_USER;
 
 		var entries = Buffer.fromArray<JSON.JSON>([]);
 

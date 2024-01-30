@@ -4,6 +4,7 @@ import { _SERVICE } from "./declarations/backend/backend.did";
 export type User = {
 	owner: String;
 	creation: Number;
+	log:[Text];
 };
 
 export type NoteType = {

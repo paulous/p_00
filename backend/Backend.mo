@@ -27,8 +27,6 @@ shared ({caller}) actor class Dnote(){
 
 	type User = Types.User;
 
-	type PostResult = Types.PostResult;
-
 	let owner = caller;
 
 	let MAX_NOTES_PER_USER = Constants.MAX_NOTES_PER_USER;
@@ -42,6 +40,7 @@ shared ({caller}) actor class Dnote(){
 	stable let state:State = object {
 		public let users = Map.new<Principal, User>(phash);
 		public let notes = Map.new<Principal, List.List<Note>>(phash);
+		public let pubNotes = Map.new<Principal, List.List<Note>>(phash);
 	};
 
 	public shared ({caller}) func isUserRegistred () : async Text {

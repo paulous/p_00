@@ -1,6 +1,7 @@
 import Map "mo:map/Map";
 import List "mo:base/List";
 import Result "mo:base/Result";
+import Array "mo:base/Array";
 import JSON "mo:json/JSON";
 
 module BaseTypes {
@@ -16,6 +17,7 @@ module BaseTypes {
 	public type User = {
 		owner: Principal;
 		creation:Int;
+		log:List.List<Int>;
 	};
 
 	public type Note = {
