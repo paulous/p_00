@@ -40,7 +40,6 @@ shared ({caller}) actor class Dnote(){
 	stable let state:State = object {
 		public let users = Map.new<Principal, User>(phash);
 		public let notes = Map.new<Principal, List.List<Note>>(phash);
-		public let pubNotes = Map.new<Principal, List.List<Note>>(phash);
 	};
 
 	public shared ({caller}) func isUserRegistred () : async Text {
@@ -49,6 +48,18 @@ shared ({caller}) actor class Dnote(){
 
 
 		Utils.is_user_registered(caller, state.users);
+	};
+
+	public shared query func pubNotes() : async Text {
+
+  		Notes.pubNotes(state);
+	};
+
+	public shared ({caller}) func pubPriv (noteId:Text) : async Text {
+
+		if (Principal.isAnonymous(caller)) throw Error.reject("Anonymous users cannot register");
+
+		Notes.pubPriv(noteId, caller, state);
 	};
 
 	public shared ({ caller }) func createNote({ description : Text; title : Text }:Note) : async Text {
@@ -61,7 +72,7 @@ shared ({caller}) actor class Dnote(){
 		assert Text.size(description) < MAX_CHARS_NOTE_DESC 
 		and Text.size(description) > MIN_CHARS_NOTE_DESC;
 		
-		Notes.createNote(caller, state, {description; title; id="0"});
+		Notes.createNote(caller, state, {description; title; id="0"; pub=false});
 	};
 
 
@@ -73,7 +84,7 @@ shared ({caller}) actor class Dnote(){
 	};
 
 
-	public shared ({ caller }) func updateNote({title:Text; description:Text; id:Text;  }) : async Text {
+	public shared ({ caller }) func updateNote({ title:Text; description:Text; id:Text }) : async Text {
 
 		assert not Principal.isAnonymous(caller);
 

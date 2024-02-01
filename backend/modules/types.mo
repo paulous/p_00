@@ -14,16 +14,22 @@ module BaseTypes {
 		notes:Notes;
 	};
 
+	public type Pub = {
+		notes:List.List<Text> or List.List<None>;
+	};
+
 	public type User = {
 		owner: Principal;
 		creation:Int;
 		log:List.List<Int>;
+		pub:Pub;
 	};
 
 	public type Note = {
 		id:Text;
 		title:Text;
-		description:Text
+		description:Text;
+		pub:Bool;
 	};
 
 	type Error = {

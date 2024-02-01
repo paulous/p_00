@@ -2,19 +2,26 @@ import { useState } from "react"
 import { createActor, backend } from "../declarations/backend"
 import { canisterId } from "../declarations/internet_identity"
 import { AuthClient } from "@dfinity/auth-client"
-import { HttpAgent, AnonymousIdentity } from "@dfinity/agent"
+import { HttpAgent, AnonymousIdentity, ActorSubclass } from "@dfinity/agent"
 
 import { State } from '../Types';
+import { _SERVICE } from "../declarations/backend/backend.did"
 
-export default function SignIn({setActor, fetchData}:any){
+export default function SignIn({setActor}:any){
 
-	let [authC, authCset] =  useState<{logout:any, isAuthenticated:Boolean}>();
+	type AuthC = {
+		client:AuthClient,
+		isAuthenticated:Boolean,
+		actor:ActorSubclass<_SERVICE>
+	}
+
+	let [authC, authCset] =  useState<AuthC>();
 	
 	let actor = backend;
 
 	let handle = async (authClient:AuthClient) => {
 
-		const configValue:string = (process.env.CANISTER_ID_BACKEND as string)
+		const configValue:string = (process.env.CANISTER_ID_BACKEND as string);
 		const identity = authClient.getIdentity();
 		const agent = new HttpAgent({ identity });
 
@@ -22,9 +29,7 @@ export default function SignIn({setActor, fetchData}:any){
 			agent,
 		});
 
-		let user = await actor.isUserRegistred()
-
-		console.log(user)
+		let user = JSON.parse( await actor.isUserRegistred() )
 
 		setActor((state:State) => (
 			{...state,
@@ -33,29 +38,38 @@ export default function SignIn({setActor, fetchData}:any){
 				backend:actor,
 				isAuth:true
 			}
-		))
+		));
 
-		let isAuthenticated:boolean = await authClient.isAuthenticated()
+		let isAuthenticated:boolean = await authClient.isAuthenticated();
 
-		authCset({logout:authClient.logout, isAuthenticated})
-		fetchData(actor)
-	}
+		authCset({client:authClient, isAuthenticated, actor});
+		
+		const notesArray = await actor.readNotes();
+		let notes = JSON.parse(notesArray);
+
+		console.log(notes)
+		
+		setActor((state:State) => ({ ...state, notes }));
+	};
 
 	let signin = async (e: { preventDefault: () => void }) => {
 		e.preventDefault();
 
 		if(authC && authC.isAuthenticated){
 
-			const client: AuthClient = await AuthClient.create();
+			//const client: AuthClient = await AuthClient.create();
 
-			await client.logout();
+			await authC.client.logout();
+
+			const notesArray = await authC.actor.pubNotes();
+			let notes = JSON.parse(notesArray);
 
 			setActor(
 				{
-					user:null,
+					user:{},
 					identity:new AnonymousIdentity(),
 					backend,
-					notes: [],
+					notes,
 					isAuth:false
 				}
 			);

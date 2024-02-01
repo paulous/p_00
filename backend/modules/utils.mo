@@ -6,6 +6,8 @@ import Int "mo:base/Int";
 import Buffer "mo:base/Buffer";
 import Map "mo:map/Map";
 import JSON "mo:json/JSON";
+import {print} "mo:base/Debug";
+import None "mo:base/None";
 
 import Types "types";
 
@@ -24,41 +26,44 @@ module {
 			case (null) {
 				let creation = Time.now();
 				let log = List.make<Int>(creation);
-
-				let usr = {owner = caller; creation; log};
+				print(debug_show(log));
+				let usr:User = {owner = caller; creation; log; pub = {notes = List.nil()}};
 				ignore Map.put(users, phash, caller, usr);
 
 				JSON.show(
 					#Object([
 						("owner", #String(Principal.toText(caller))),
 						("creation", #Number(usr.creation)),
-						("log", #Array([#Number(creation)])) 
+						("log", #Array([#Number(creation)])),
+						("pub", #Object([("notes", #Array([]))])) 
 					])
 				);
+
 			};
 
 			case (?user) {
 				let now = Time.now();
 				let log = user.log;
-				let newLog = List.push(now, user.log);
+				let newLog = List.push(now, log);
 
-				let updateUsr = {owner = caller; creation = user.creation; log = newLog};
+				let notes = user.pub.notes;
+				//let pubNotes = Option.get(Map.get(user.pub.notes, phash, caller), List.nil());
+
+				let updateUsr = {owner = caller; creation = user.creation; log = newLog; pub = user.pub};
 				ignore Map.put(users, phash, caller, updateUsr);
 
-				var entries = Buffer.fromArray<JSON.JSON>([]);
+				var logEntries = Buffer.fromArray<JSON.JSON>([]);
+				var pubEntries = Buffer.fromArray<JSON.JSON>([]);
 
-				List.iterate(newLog, func (log:Int) {
-
-					entries.add(
-						#Number(log)
-					);
-				});
+				List.iterate(newLog, func (log:Int) { logEntries.add( #Number(log) ) });
+				List.iterate(notes, func (pub:Text) { pubEntries.add( #String(pub) ) });
 				
 				JSON.show(
 					#Object([
 						("owner", #String(Principal.toText(user.owner))),
 						("creation", #Number(user.creation)),
-						("log", #Array(Buffer.toArray(entries)))
+						("log", #Array(Buffer.toArray(logEntries))),
+						("pub", #Object([("notes", #Array(Buffer.toArray(pubEntries)))])) 
 					])
 				);
 			};

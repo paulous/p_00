@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AnonymousIdentity } from '@dfinity/agent';
 import { backend } from './declarations/backend';
 import styled from 'styled-components';
@@ -42,22 +42,23 @@ const Main = styled.main`
 `;
 
 export default function App() {
+
   const [actor, setActor] = useState<State>({
-	user:{},
+    user: { log: [] },
     identity: new AnonymousIdentity(),
     backend,
-	notes:[],
-	isAuth:false
+    notes: [],
+    isAuth: false,
   });
 
-  const fetchData = async (signedin: any) => {
-	  const notesArray = await signedin.readNotes();
+  const pubNotes = async () => {
+	  const notesArray = await actor.backend.pubNotes();
 	  let notes = JSON.parse(notesArray);
-	  console.log(notes)
-    setActor((state) => ({ ...state, notes }));
-  };
-
-  //useEffect(() => { fetchData(actor.backend) }, [])
+	  setActor((state:State) => ({...state, notes}))
+  }
+  
+  useEffect(() => { pubNotes() }, [])
+  
 
   return (
     <>
@@ -67,11 +68,16 @@ export default function App() {
           <h2>dNote</h2>
           <div>
             <h4>{actor?.identity?.getPrincipal().toString()}</h4>
-            <SignIn {...{ setActor, fetchData }} />
+            <h4>
+              {actor?.user?.log?.length > 0 &&
+                new Date(
+                  Number(String(actor?.user?.log[0]).slice(0, 13))).toDateString()}
+            </h4>
+            <SignIn {...{ setActor }} />
           </div>
         </Nav>
         <Main>
-          {actor?.identity && <CreateArea {...{ actor, setActor }} />}
+          <CreateArea {...{ actor, setActor }} />
         </Main>
       </AppMain>
     </>

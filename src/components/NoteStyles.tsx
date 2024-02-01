@@ -50,6 +50,16 @@ export const Main = styled.div`
       margin: 0.8em 0;
     }
 
+	.align-public {
+		position: absolute;
+		left: 10px;
+		bottom: 10px;
+		display: flex;
+		align-items: center;
+		font-size: 0.8rem;
+		gap: 6px;
+	}
+
     .align-date {
       position: absolute;
       right: 10px;
@@ -98,7 +108,8 @@ export const Main = styled.div`
     right: 0;
     pointer-events: none;
 
-    input, textarea {
+    input,
+    textarea {
       &:focus-visible {
         outline: 2px solid rgba(46, 95, 212, 1);
         border-radius: 3px;

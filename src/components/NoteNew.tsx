@@ -4,9 +4,9 @@ import {Main} from './NoteStyles';
 
 export default function NoteNew(props:any) {
 
-	const [updateNote, setUpdateNote] = useState<NoteType>({ title:'', description:'', id:'' });
+	const [updateNote, setUpdateNote] = useState<NoteType>({ title:"", description:"", id:"''", pub:false });
 
-	function handleClick(e: { preventDefault: () => void; currentTarget: { title: string; }; }) {
+	function handleClick(e: { preventDefault: () => void; currentTarget: { title: String; }; }) {
 		e.preventDefault();
 		props.onAdd(updateNote);
 

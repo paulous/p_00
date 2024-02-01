@@ -6,6 +6,7 @@ export default function Note(props: any) {
 
 	const [update, setUpdate] = useState(false);
 	const [updateNote, setUpdateNote] = useState<NoteType>(props.note);
+	const [pub, setPub] = useState<Boolean>(props.note.pub);
 
 	function handleClick(e: { preventDefault: () => void; currentTarget: { title: string; }; }) {
 		e.preventDefault();
@@ -37,6 +38,25 @@ export default function Note(props: any) {
 				[name]: value
 			};
 		});
+	}
+
+	let pubToPriv = async () => {
+		try {
+			let ooo = await props.backend.pubPriv(props.note.id);
+			console.log(ooo)
+
+			setUpdateNote((state:NoteType) => {
+				return {
+					...state,
+					pub: !props.note.pub
+				};
+			});
+
+			setPub(state => !state)
+			
+		} catch (error) {
+			console.log(error)
+		}
 	}
 	/*let noteRowHeight = () => {//get breaks in string, set default. Hidden textarea +5
 		//console.log(updateNote.description.replace(/\s\n/g," ").split(" ").length -1)
@@ -78,6 +98,7 @@ export default function Note(props: any) {
 			:	<div className="note-front">
 					<h2>{props.note.title.toUpperCase()}</h2>
 					<p>{props.note.description}</p>
+					<a className="align-public" onClick={pubToPriv}>{pub ? "public" : "private"}</a>
 					{
 						props.note.id && props.updating !== props.note.id
 						? 	<div className="align-date">
