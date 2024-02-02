@@ -27,12 +27,12 @@ export const EditBtn = styled.div`
     background: rgba(22, 25, 37, 0.1);
   }
 `;
-export const Main = styled.div`
+export const Main = styled.div<{pub:Boolean}>`
   position: relative;
   width: 300px;
   height: max-content;
   min-height: 350px;
-  border-radius: 12px;
+  border-radius: 6px;
   padding: 12px;
   cursor: pointer;
   background: rgba(41, 45, 62, 1);
@@ -52,18 +52,30 @@ export const Main = styled.div`
 
 	.align-public {
 		position: absolute;
-		left: 10px;
-		bottom: 10px;
+		left: 5px;
+		bottom: 5px;
 		display: flex;
 		align-items: center;
 		font-size: 0.8rem;
-		gap: 6px;
+		gap: 3px;
+		color:${props => props.pub ? "rgba(68, 255, 68, 0.5);" : "rgb(214, 0, 0);"};
+        background: ${props => props.pub ? "rgba(0, 255, 0, 0.1);" : "rgba(255, 0, 0, 0.1);"};
+		border-radius: 3px;
+		padding:2px 5px;
+		
+	.pub-on {
+        width: 2px;
+        height: 2px;
+        background: ${props => props.pub ? "rgb(0, 255, 0);" : "rgb(255, 0, 0);"} 
+        padding: 3px;
+        border-radius: 50%;
+      }
 	}
 
     .align-date {
       position: absolute;
-      right: 10px;
-      bottom: 10px;
+      right: 5px;
+      bottom: 5px;
       display: flex;
       align-items: center;
       font-size: 0.8rem;
@@ -78,10 +90,21 @@ export const Main = styled.div`
       }
     }
   }
+  .pub-off {
+    position: absolute;
+    left: 10px;
+    bottom: 13px;
+    width: 2px;
+    height: 2px;
+    background: rgb(255, 0, 0);
+    padding: 3px;
+    border-radius: 50%;
+    animation: ${blink} 0.1s infinite alternate;
+  }
   .updated-off {
     position: absolute;
     right: 10px;
-    bottom: 10px;
+    bottom: 13px;
     width: 2px;
     height: 2px;
     background: rgb(255, 0, 0);

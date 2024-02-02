@@ -177,7 +177,9 @@ function CreateArea({ actor, setActor }: any) {
 								onUpdate={updateNote}
 								onDelete={deleteNote}
 								updating={updating}
+								setUpdating={setUpdating}
 								backend={backend}
+								isAuth={isAuth}
 							/>
 						);
 					})}

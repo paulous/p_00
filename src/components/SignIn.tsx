@@ -3,9 +3,9 @@ import { createActor, backend } from "../declarations/backend"
 import { canisterId } from "../declarations/internet_identity"
 import { AuthClient } from "@dfinity/auth-client"
 import { HttpAgent, AnonymousIdentity, ActorSubclass } from "@dfinity/agent"
+import { _SERVICE } from "../declarations/backend/backend.did"
 
 import { State } from '../Types';
-import { _SERVICE } from "../declarations/backend/backend.did"
 
 export default function SignIn({setActor}:any){
 

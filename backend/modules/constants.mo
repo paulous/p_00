@@ -8,4 +8,6 @@ module {
 	
 	public let MAX_CHARS_NOTE_DESC = 250;
 	public let MIN_CHARS_NOTE_DESC = 5;
+
+	public let MAX_PUBLIC_NOTES = 3;
 };

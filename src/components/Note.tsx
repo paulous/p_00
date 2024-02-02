@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {NoteType} from "../Types";
 import {Main, EditBtn} from './NoteStyles';
 
@@ -7,6 +7,7 @@ export default function Note(props: any) {
 	const [update, setUpdate] = useState(false);
 	const [updateNote, setUpdateNote] = useState<NoteType>(props.note);
 	const [pub, setPub] = useState<Boolean>(props.note.pub);
+	const [pubUpdating, setPubUpdating] = useState<Boolean>(false);
 
 	function handleClick(e: { preventDefault: () => void; currentTarget: { title: string; }; }) {
 		e.preventDefault();
@@ -42,9 +43,12 @@ export default function Note(props: any) {
 
 	let pubToPriv = async () => {
 		try {
-			let ooo = await props.backend.pubPriv(props.note.id);
-			console.log(ooo)
+			setPubUpdating(true);
+			let response = await props.backend.pubPriv(props.note.id);
+			setPubUpdating(false);
 
+			if(response === "MAX_PUBLIC_NOTES") {alert("Max public notes is 3. "); return;}
+			
 			setUpdateNote((state:NoteType) => {
 				return {
 					...state,
@@ -58,6 +62,9 @@ export default function Note(props: any) {
 			console.log(error)
 		}
 	}
+
+	useEffect(() => {setPub(props.note.pub)}, [props.note]) //update needed for refresh
+	
 	/*let noteRowHeight = () => {//get breaks in string, set default. Hidden textarea +5
 		//console.log(updateNote.description.replace(/\s\n/g," ").split(" ").length -1)
 		//console.log(updateNote.description.split("\n").length)
@@ -66,12 +73,12 @@ export default function Note(props: any) {
 		return 0
 	}*/
 	return (
-		<Main>
-			{props.note.id && <EditBtn title={'edit'} onClick={handleClick}><span>{update ? "< back" : ""}</span></EditBtn>}
-			{!update && <button title={'delete'} className="delete" onClick={handleClick}>
+		<Main pub={pub}>
+			{props.note.id && props.isAuth && <EditBtn title={'edit'} onClick={handleClick}><span>{update ? "< back" : ""}</span></EditBtn>}
+			{!update && props.isAuth && <button title={'delete'} className="delete" onClick={handleClick}>
 				X
 			</button>}
-			{update
+			{update && props.isAuth
 			?	<>
 					<form>
 						<input
@@ -98,7 +105,16 @@ export default function Note(props: any) {
 			:	<div className="note-front">
 					<h2>{props.note.title.toUpperCase()}</h2>
 					<p>{props.note.description}</p>
-					<a className="align-public" onClick={pubToPriv}>{pub ? "public" : "private"}</a>
+					{	
+						!pubUpdating
+						?	<div className="align-public" onClick={pubToPriv}>
+								<span className="pub-on" />
+								<span>
+									{pub ? "public" : "private"}
+								</span>
+							</div>
+						:	<span className="pub-off" />
+					}
 					{
 						props.note.id && props.updating !== props.note.id
 						? 	<div className="align-date">
