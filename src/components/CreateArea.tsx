@@ -130,6 +130,7 @@ function CreateArea({ actor, setActor }: any) {
 				title,
 				description: descRetainFormatting,
 				id,
+				pub
 			});
 			setUpdating('')
 			//setNote({ title: '', description: '', id: '' });

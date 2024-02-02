@@ -46,8 +46,6 @@ export default function SignIn({setActor}:any){
 		
 		const notesArray = await actor.readNotes();
 		let notes = JSON.parse(notesArray);
-
-		console.log(notes)
 		
 		setActor((state:State) => ({ ...state, notes }));
 	};

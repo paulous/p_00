@@ -63,19 +63,19 @@ export const Main = styled.div<{pub:Boolean}>`
 		border-radius: 3px;
 		padding:2px 5px;
 		
-	.pub-on {
-        width: 2px;
-        height: 2px;
-        background: ${props => props.pub ? "rgb(0, 255, 0);" : "rgb(255, 0, 0);"} 
-        padding: 3px;
-        border-radius: 50%;
-      }
+		.pub-on {
+			width: 2px;
+			height: 2px;
+			background: ${props => props.pub ? "rgb(0, 255, 0);" : "rgb(255, 0, 0);"} 
+			padding: 3px;
+			border-radius: 50%;
+      	}
 	}
 
     .align-date {
       position: absolute;
-      right: 5px;
-      bottom: 5px;
+      right: 10px;
+      bottom: 7px;
       display: flex;
       align-items: center;
       font-size: 0.8rem;
