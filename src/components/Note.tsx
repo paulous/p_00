@@ -73,7 +73,7 @@ export default function Note(props: any) {
 		return 0
 	}*/
 	return (
-		<Main pub={pub}>
+		<Main $pub={pub}>
 			{props.note.id && props.isAuth && <EditBtn title={'edit'} onClick={handleClick}><span>{update ? "< back" : ""}</span></EditBtn>}
 			{!update && props.isAuth && <button title={'delete'} className="delete" onClick={handleClick}>
 				X
