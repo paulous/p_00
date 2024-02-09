@@ -27,7 +27,7 @@ export const EditBtn = styled.div`
     background: rgba(22, 25, 37, 0.1);
   }
 `;
-export const Main = styled.div<{pub:Boolean}>`
+export const Main = styled.div<{$pub:Boolean}>`
   position: relative;
   width: 300px;
   height: max-content;
@@ -58,15 +58,15 @@ export const Main = styled.div<{pub:Boolean}>`
 		align-items: center;
 		font-size: 0.8rem;
 		gap: 3px;
-		color:${props => props.pub ? "rgba(68, 255, 68, 0.5);" : "rgb(214, 0, 0);"};
-        background: ${props => props.pub ? "rgba(0, 255, 0, 0.1);" : "rgba(255, 0, 0, 0.1);"};
+		color:${props => props.$pub ? "rgba(68, 255, 68, 0.5);" : "rgb(214, 0, 0);"};
+        background: ${props => props.$pub ? "rgba(0, 255, 0, 0.1);" : "rgba(255, 0, 0, 0.1);"};
 		border-radius: 3px;
 		padding:2px 5px;
 		
 		.pub-on {
 			width: 2px;
 			height: 2px;
-			background: ${props => props.pub ? "rgb(0, 255, 0);" : "rgb(255, 0, 0);"} 
+			background: ${props => props.$pub ? "rgb(0, 255, 0);" : "rgb(255, 0, 0);"} 
 			padding: 3px;
 			border-radius: 50%;
       	}
