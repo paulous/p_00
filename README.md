@@ -1,4 +1,6 @@
-Note taking dapp with Internet Identity.
+Note taking dapp "dNote", with Internet Identity.
+
+Create public and private notes. Basic template for further exploration.
 
 Using template:
 # Vite + React + Motoko
