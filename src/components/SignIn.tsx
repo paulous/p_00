@@ -31,23 +31,27 @@ export default function SignIn({setActor}:any){
 
 		let user = JSON.parse( await actor.isUserRegistred() )
 
+		let isAuthenticated:boolean = await authClient.isAuthenticated();
+
+		const notesJSON = await actor.readNotes();
+
+		const userPubNotesJSON = await actor.userPubNotes();
+
+		let notes = JSON.parse(notesJSON);
+		let userPubNotes = JSON.parse(userPubNotesJSON);
+
 		setActor((state:State) => (
 			{...state,
 				user,
 				identity, 
 				backend:actor,
+				notes, 
+				userPubNotes,
 				isAuth:true
 			}
 		));
 
-		let isAuthenticated:boolean = await authClient.isAuthenticated();
-
-		authCset({client:authClient, isAuthenticated, actor});
-		
-		const notesArray = await actor.readNotes();
-		let notes = JSON.parse(notesArray);
-		
-		setActor((state:State) => ({ ...state, notes }));
+		authCset({client:authClient, isAuthenticated, actor});		
 	};
 
 	let signin = async (e: { preventDefault: () => void }) => {

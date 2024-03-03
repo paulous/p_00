@@ -2,6 +2,7 @@ import Map "mo:map/Map";
 import List "mo:base/List";
 import Result "mo:base/Result";
 import Array "mo:base/Array";
+import Principal "mo:base/Principal";
 import JSON "mo:json/JSON";
 
 module BaseTypes {
@@ -30,6 +31,10 @@ module BaseTypes {
 		title:Text;
 		description:Text;
 		pub:Bool;
+	};
+
+	public type PubUserNote = Note and {
+		principal: Text
 	};
 
 	type Error = {

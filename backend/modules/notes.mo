@@ -24,75 +24,7 @@ module {
 
 	let { phash } = Map;
 
-	public func pubNotes(state : State) : Text {
-		
-		var pubnotes = Buffer.fromArray<JSON.JSON>([]);
-
-		Map.forEach<Principal, List.List<Note>>(state.notes, func (key, notesList) {
-			
-
-			List.iterate(notesList, func (note:Note) { 
-				if(note.pub){
-					pubnotes.add( #Object([
-						("id", #String(note.id)),
-						("title", #String(note.title)),
-						("description", #String(note.description)),
-						("pub", #Boolean(note.pub)),
-					]) );
-				}
-			});
-		});
-
-		JSON.show(#Array(Buffer.toArray(pubnotes)));
-	};
-
-	public func pubPriv(id : Text, caller : Principal, state : State) : Text {
-
-		var time = Time.now();
-		let withNewId = Int.toText(time);
-
-		let notes = Option.get(Map.get(state.notes, phash, caller), List.nil());// get notes
-
-		assert not List.isNil(notes);// are there 0 notes?
-
-		let pubSize = List.filter<Note>(notes, func (note) {note.pub == true});// how many
-
-		if (not List.isNil(pubSize)){// if there are pub = true notes
-
-			let getNote:Note or {pub:Bool} = switch (List.find<Note>(pubSize, func (note) {note.id == id})){
-				case (null) {{pub = false}};// no current note exists
-				case (?note) {note};// get current note
-			};
-			//if current note pub = true, then check how many notes are public
-			if(getNote.pub == false and List.size(pubSize) > MAX_PUBLIC_NOTES) return "MAX_PUBLIC_NOTES";
-		};
-
-		let result = switch (List.find<Note>(notes, func(note) { note.id == id })) {
-			case (null) {"";};
-			case (?note) {
-
-				let newNote:Note = {
-					id = note.id;
-					title = note.title;
-					description = note.description;
-					pub = if (note.pub) false else true;
-				};
-
-				let updatedNotes:List.List<Note> = List.map(
-					notes,
-					func(note : Note) : Note { if (note.id == id) newNote else note },
-				);
-
-				ignore Map.put(state.notes, phash, caller, updatedNotes);
-
-				//print(debug_show(updatedNotes));
-				//print(debug_show(Option.get(Map.get(state.notes, phash, caller), List.nil())));
-
-				newNote.id;
-			};
-		};
-	};
-
+	
 	public func createNote(
 		caller : Principal,
 		state : State,
@@ -157,7 +89,7 @@ module {
 		List.iterate(
 			userNotes,
 			func(note : Note) {
-				entries.add(
+				if (note.pub == false) entries.add(
 					#Object([
 						("id", #String(note.id)),
 						("title", #String(note.title)),

@@ -1,13 +1,18 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import {NoteType} from "../Types";
-import {Main, EditBtn} from './NoteStyles';
+import {Main, EditBtn} from './noteStyles';
 
 export default function Note(props: any) {
 
-	const [update, setUpdate] = useState(false);
+	const [update, setUpdate] = useState<Boolean>(false);
 	const [updateNote, setUpdateNote] = useState<NoteType>(props.note);
 	const [pub, setPub] = useState<Boolean>(props.note.pub);
 	const [pubUpdating, setPubUpdating] = useState<Boolean>(false);
+
+	let p = useRef(props.note.principal);
+	let up = useRef(props.identity.getPrincipal().toString());
+	let principal = p.current;
+	let userPrince = up.current;
 
 	function handleClick(e: { preventDefault: () => void; currentTarget: { title: string; }; }) {
 		e.preventDefault();
@@ -22,10 +27,9 @@ export default function Note(props: any) {
 			props.onUpdate(updateNote);
 		} 
 		else if(e.currentTarget.title === 'delete'){
-			props.onDelete(props.note.id);
+			props.onDelete(props.note.id, pub);
 		}
-
-	}
+	};
 
 	function handleChange(e: { preventDefault: () => void; target: { name: string; value: string; }; }) {
 		e.preventDefault();
@@ -46,22 +50,16 @@ export default function Note(props: any) {
 			setPubUpdating(true);
 			let response = await props.backend.pubPriv(props.note.id);
 			setPubUpdating(false);
-
+			
 			if(response === "MAX_PUBLIC_NOTES") {alert("Max public notes is 3. "); return;}
 			
-			setUpdateNote((state:NoteType) => {
-				return {
-					...state,
-					pub: !props.note.pub
-				};
-			});
-
-			setPub(state => !state)
+			props.pubSwitch(!props.note.pub, props.note.id);
 			
 		} catch (error) {
 			console.log(error)
 		}
 	}
+
 
 	useEffect(() => {setPub(props.note.pub)}, [props.note]) //update needed for refresh
 	
@@ -73,9 +71,9 @@ export default function Note(props: any) {
 		return 0
 	}*/
 	return (
-		<Main pub={pub}>
+		<Main $pub={principal !== userPrince && pub }>
 			{props.note.id && props.isAuth && <EditBtn title={'edit'} onClick={handleClick}><span>{update ? "< back" : ""}</span></EditBtn>}
-			{!update && props.isAuth && <button title={'delete'} className="delete" onClick={handleClick}>
+			{((!update && props.isAuth && !principal) || (principal && principal === userPrince)) && <button title={'delete'} className="delete" onClick={handleClick}>
 				X
 			</button>}
 			{update && props.isAuth
@@ -103,16 +101,17 @@ export default function Note(props: any) {
 					</form>
 				</>
 			:	<div className="note-front">
+					{principal && <h6>{principal}</h6>}
 					<h2>{props.note.title.toUpperCase()}</h2>
 					<p>{props.note.description}</p>
 					{	
 						!pubUpdating
-						?	<div className="align-public" onClick={pubToPriv}>
+						?	<button className="align-public" onClick={pubToPriv} disabled={(principal && principal !== userPrince )|| !props.isAuth ? true : false}>
 								<span className="pub-on" />
 								<span>
 									{pub ? "public" : "private"}
 								</span>
-							</div>
+							</button>
 						:	<span className="pub-off" />
 					}
 					{
