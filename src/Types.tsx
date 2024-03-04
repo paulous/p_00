@@ -13,6 +13,7 @@ export type NoteType = {
 	title: string;
 	description: string;
 	pub:Boolean;
+	principal ? : String;
 };
 
 export type State = {
@@ -20,5 +21,6 @@ export type State = {
 	identity:Identity | AnonymousIdentity;
 	backend:ActorSubclass<_SERVICE>;
 	notes:[NoteType] | [];
+	userPubNotes?:[NoteType] | [];
 	isAuth:Boolean;
 };

@@ -35,10 +35,19 @@ export const Main = styled.div<{$pub:Boolean}>`
   border-radius: 6px;
   padding: 12px;
   cursor: pointer;
-  background: rgba(41, 45, 62, 1);
+  background: ${(props) =>
+    props.$pub ? 'rgba(49, 71, 49, 0.788);' : 'rgba(41, 45, 62, 1);'};
   display: flex;
 
+  @media (max-width: 600px) {
+    width: 195px;
+  	min-height: 250px;
+
+  }
+
   .note-front {
+	overflow:hidden;
+
     h2 {
       line-height: 1;
     }
@@ -48,6 +57,11 @@ export const Main = styled.div<{$pub:Boolean}>`
       word-wrap: balance;
       font-size: 1.2rem;
       margin: 0.8em 0;
+
+      @media (max-width: 600px) {
+    	font-size: 0.9rem;
+
+  		}
     }
 
 	.align-public {
@@ -58,15 +72,26 @@ export const Main = styled.div<{$pub:Boolean}>`
 		align-items: center;
 		font-size: 0.8rem;
 		gap: 3px;
+<<<<<<< HEAD:src/components/NoteStyles.tsx
 		color:${props => props.$pub ? "rgba(68, 255, 68, 0.5);" : "rgb(214, 0, 0);"};
         background: ${props => props.$pub ? "rgba(0, 255, 0, 0.1);" : "rgba(255, 0, 0, 0.1);"};
+=======
+		color:${(props) =>
+      props.$pub ? 'rgba(68, 255, 68, 0.5);' : 'rgb(214, 0, 0);'};
+        background: ${(props) =>
+          props.$pub ? 'rgba(0, 255, 0, 0.1);' : 'rgba(255, 0, 0, 0.1);'};
+>>>>>>> edit-anything:src/components/noteStyles.tsx
 		border-radius: 3px;
 		padding:2px 5px;
 		
 		.pub-on {
 			width: 2px;
 			height: 2px;
+<<<<<<< HEAD:src/components/NoteStyles.tsx
 			background: ${props => props.$pub ? "rgb(0, 255, 0);" : "rgb(255, 0, 0);"} 
+=======
+			background: ${(props) => (props.$pub ? 'rgb(0, 255, 0);' : 'rgb(255, 0, 0);')} 
+>>>>>>> edit-anything:src/components/noteStyles.tsx
 			padding: 3px;
 			border-radius: 50%;
       	}

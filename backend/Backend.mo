@@ -17,6 +17,7 @@ import Error "mo:base/Error";
 import Types "./modules/types";
 import Constants "modules/constants";
 import Notes "modules/notes";
+import PubNotes "modules/userPubNotes";
 import Utils "modules/utils";
 
 shared ({caller}) actor class Dnote(){
@@ -26,6 +27,8 @@ shared ({caller}) actor class Dnote(){
 	type Note = Types.Note;
 
 	type User = Types.User;
+
+	type PubUserNote = Types.PubUserNote;
 
 	let owner = caller;
 
@@ -42,6 +45,8 @@ shared ({caller}) actor class Dnote(){
 		public let notes = Map.new<Principal, List.List<Note>>(phash);
 	};
 
+
+
 	public shared ({caller}) func isUserRegistred () : async Text {
 
 		if (Principal.isAnonymous(caller)) throw Error.reject("Anonymous users cannot register");
@@ -50,17 +55,36 @@ shared ({caller}) actor class Dnote(){
 		Utils.is_user_registered(caller, state.users);
 	};
 
-	public shared query func pubNotes() : async Text {
 
-  		Notes.pubNotes(state);
+
+
+	public shared ({caller}) func updateUserPubNote (pubNoteUpdate:PubUserNote) : async Text {
+
+		if (Principal.isAnonymous(caller)) throw Error.reject("Anonymous no");
+
+  		PubNotes.updateUserPubNote(caller, state, pubNoteUpdate );
+	};
+
+	public shared query ({caller}) func userPubNotes () : async Text {
+
+		if (Principal.isAnonymous(caller)) throw Error.reject("Anonymous no");
+
+		PubNotes.userPubNotes(caller, state);
 	};
 
 	public shared ({caller}) func pubPriv (noteId:Text) : async Text {
 
-		if (Principal.isAnonymous(caller)) throw Error.reject("Anonymous users cannot register");
+		if (Principal.isAnonymous(caller)) throw Error.reject("Anonymous no");
 
-		Notes.pubPriv(noteId, caller, state);
+		PubNotes.pubPriv(noteId, caller, state);
 	};
+
+	public shared func pubNotes () : async Text {
+
+		PubNotes.pubNotes(state);
+	};
+
+
 
 	public shared ({ caller }) func createNote({ description : Text; title : Text }:Note) : async Text {
 
